@@ -20,6 +20,7 @@ void processConfigFile()
 {
     TwitterInfo twitterInfo;
 
+    writefln("Loading config file %s", g_configFile);
     if (exists(g_configFile))
     {
         JSONValue root;
@@ -95,6 +96,7 @@ void usage()
 
 int main(string[] args)
 {
+    g_configFile = buildPath(g_rootPath, "tweetit.config");
     string textToTweet = null;
     string imagePath = null;
     string mimeType = null;
@@ -105,7 +107,21 @@ int main(string[] args)
     uint lastUsedArg = 0;
     for (i = 1; i < args.length; i++)
     {
-        if (cmp(args[i], "-img") == 0)
+        if (cmp(args[i], "-config") == 0)
+        {
+            i++;
+            if (i < args.length)
+            {
+                g_configFile = args[i];
+                lastUsedArg = i;
+            }
+            else
+            {
+                usage();
+                return 1;
+            }
+        }
+        else if (cmp(args[i], "-img") == 0)
         {
             i++;
             if (i < args.length)
@@ -210,7 +226,6 @@ int main(string[] args)
     if (textToTweet !is null)
     {
         g_rootPath = dirName(thisExePath());
-        g_configFile = buildPath(g_rootPath, "tweetit.config");
         processConfigFile();
         log("twitter info: %s", g_twitterInfo.toJSON());
 
